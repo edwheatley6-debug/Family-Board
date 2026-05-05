@@ -1,0 +1,72 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>Family Board</title>
+<style>
+:root{--bg1:#fff7ed;--bg2:#e0f2fe;--txt:#111827;--muted:#4b5563;--shadow:0 14px 30px rgba(0,0,0,.12)}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}body{margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;background:linear-gradient(180deg,var(--bg1),var(--bg2));color:var(--txt)}
+.app{max-width:1100px;margin:0 auto;min-height:100vh;padding:18px;display:flex;flex-direction:column;gap:18px}.screen{display:none;flex-direction:column;gap:18px}.screen.active{display:flex}
+.hero{background:linear-gradient(135deg,#fde68a,#f9a8d4,#bfdbfe);border-radius:32px;padding:22px;box-shadow:var(--shadow)}h1{margin:0;font-size:clamp(34px,6vw,58px)}.hero p{font-size:clamp(17px,2.2vw,24px);font-weight:800;margin:10px 0 0}
+.stats,.grid,.score-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}.stats{margin-top:18px}.stat,.card,.score-box{background:white;border-radius:28px;padding:18px;box-shadow:var(--shadow)}.stat{background:rgba(255,255,255,.78)}
+.stat p{margin:0}.label{font-size:clamp(18px,2.4vw,26px);font-weight:900}.value{font-size:clamp(34px,5vw,54px);font-weight:950}
+.tile{border:0;border-radius:30px;min-height:155px;padding:22px;text-align:left;cursor:pointer;box-shadow:var(--shadow);color:#111827;display:flex;flex-direction:column;justify-content:space-between}.tile:active{transform:scale(.985)}
+.emoji{font-size:clamp(40px,6vw,64px)}.t{font-size:clamp(28px,4.4vw,44px);font-weight:950;line-height:1}.s{font-size:clamp(15px,2vw,22px);font-weight:800;color:#374151;margin-top:6px}
+.henry{background:#93c5fd}.arthur{background:#86efac}.calendar{background:#c4b5fd}.music{background:#f9a8d4}.points{background:#fde68a}.netflix{background:#fca5a5}.settings{background:#cbd5e1}
+.row{display:flex;align-items:center;justify-content:space-between;gap:14px;margin-bottom:12px}.title{font-size:clamp(30px,5vw,52px);font-weight:950;margin:0}
+button{font-family:inherit}.home,.btn,.mini{border:0;border-radius:18px;background:#111827;color:white;font-weight:900;cursor:pointer}.home{padding:14px 18px;font-size:clamp(16px,2vw,22px)}.btn{padding:15px 20px;font-size:clamp(17px,2.2vw,24px)}.btn.secondary{background:#e5e7eb;color:#111827}.btn.danger{background:#b91c1c}.actions{display:flex;gap:12px;flex-wrap:wrap;margin-top:16px}
+.checklist{display:flex;flex-direction:column;gap:12px;margin-top:14px}.item{display:flex;align-items:center;gap:16px;padding:18px;border-radius:22px;background:#f9fafb;border:1px solid #e5e7eb;font-size:clamp(24px,3.8vw,38px);font-weight:850}input[type=checkbox]{width:34px;height:34px;transform:scale(1.22);accent-color:#2563eb}.done{text-decoration:line-through;color:#6b7280}
+.score-name{font-size:clamp(26px,4vw,42px);font-weight:950;margin:0 0 8px}.score{font-size:clamp(56px,9vw,100px);font-weight:950;margin:0 0 12px}.mini{font-size:clamp(20px,3vw,30px);padding:12px 16px}.score-actions{display:flex;gap:10px;flex-wrap:wrap}
+.field{display:flex;flex-direction:column;gap:8px;margin-top:14px}.field label{font-size:clamp(18px,2.5vw,26px);font-weight:900}.field input,.field textarea{width:100%;border:2px solid #e5e7eb;border-radius:18px;padding:14px;font-size:clamp(16px,2vw,21px);background:white}.field textarea{min-height:170px;line-height:1.45}.hint{font-size:clamp(14px,1.8vw,18px);color:var(--muted);font-weight:650;margin:6px 0 0}.footer{text-align:center;color:#4b5563;font-size:14px;font-weight:700}
+@media(max-width:720px){.grid,.stats,.score-grid{grid-template-columns:1fr}.tile{min-height:130px}.app{padding:12px}}
+</style>
+</head>
+<body>
+<div class="app">
+<section id="home" class="screen active">
+<div class="hero"><h1>🌈 Family Board</h1><p>Tap a tile to get started</p><div class="stats"><div class="stat"><p class="label">👦 Henry Points</p><p class="value" id="hph">0 ⭐</p></div><div class="stat"><p class="label">👦 Arthur Points</p><p class="value" id="aph">0 ⭐</p></div></div></div>
+<div class="grid">
+<button class="tile henry" data-screen="henry"><span class="emoji">👦</span><span><span class="t">Henry Chores</span><span class="s">Daily jobs</span></span></button>
+<button class="tile arthur" data-screen="arthur"><span class="emoji">👦</span><span><span class="t">Arthur Chores</span><span class="s">Daily jobs</span></span></button>
+<button class="tile calendar" id="cal"><span class="emoji">📅</span><span><span class="t">Calendar</span><span class="s">Open calendar app</span></span></button>
+<button class="tile music" id="mus"><span class="emoji">🎵</span><span><span class="t">Music</span><span class="s">Open Amazon Music</span></span></button>
+<button class="tile points" data-screen="points"><span class="emoji">⭐</span><span><span class="t">Points</span><span class="s">Pocket money tracker</span></span></button>
+<button class="tile netflix" id="net"><span class="emoji">📺</span><span><span class="t">Netflix</span><span class="s">Open Netflix</span></span></button>
+</div><div class="actions"><button class="btn secondary" data-screen="settings">⚙️ Settings</button></div>
+</section>
+<section id="henry" class="screen"><div class="card"><div class="row"><h2 class="title">👦 Henry Chores</h2><button class="home" data-screen="home">Home</button></div><div class="checklist" id="hl"></div><div class="actions"><button class="btn secondary" id="hr">Reset Henry</button></div></div></section>
+<section id="arthur" class="screen"><div class="card"><div class="row"><h2 class="title">👦 Arthur Chores</h2><button class="home" data-screen="home">Home</button></div><div class="checklist" id="al"></div><div class="actions"><button class="btn secondary" id="ar">Reset Arthur</button></div></div></section>
+<section id="points" class="screen"><div class="card"><div class="row"><h2 class="title">⭐ Points</h2><button class="home" data-screen="home">Home</button></div><div class="score-grid"><div class="score-box"><p class="score-name">Henry</p><p class="score" id="hp">0</p><div class="score-actions"><button class="mini" data-points="henry:+1">+1</button><button class="mini" data-points="henry:-1">-1</button><button class="mini" data-points="henry:reset">Reset</button></div></div><div class="score-box"><p class="score-name">Arthur</p><p class="score" id="ap">0</p><div class="score-actions"><button class="mini" data-points="arthur:+1">+1</button><button class="mini" data-points="arthur:-1">-1</button><button class="mini" data-points="arthur:reset">Reset</button></div></div></div><div class="actions"><button class="btn secondary" id="rap">Reset All Points</button></div></div></section>
+<section id="settings" class="screen"><div class="card"><div class="row"><h2 class="title">⚙️ Settings</h2><button class="home" data-screen="home">Home</button></div>
+<div class="field"><label>Henry chores</label><textarea id="ht"></textarea><p class="hint">One chore per line.</p></div>
+<div class="field"><label>Arthur chores</label><textarea id="at"></textarea><p class="hint">One chore per line.</p></div>
+<div class="field"><label>Calendar link / app link</label><input id="cl" type="text"></div>
+<div class="field"><label>Music link / app link</label><input id="ml" type="text"></div>
+<div class="field"><label>Netflix link / app link</label><input id="nl" type="text"></div>
+<div class="actions"><button class="btn" id="save">Save settings</button><button class="btn danger" id="reset">Reset whole board</button></div></div></section>
+<div class="footer">Progress is saved on this device.</div>
+</div>
+<script>
+const defaults={henryTasks:["Make bed / open blinds / turn off lights","Pyjamas away","Brush teeth","School items ready","Tidy","Clothes away","Brush teeth","Water bottle"],arthurTasks:["Make bed / open blinds / turn off lights","Pyjamas away","Brush teeth","School items ready","Tidy","Clothes away","Brush teeth","Water bottle"],henryChecks:{},arthurChecks:{},points:{henry:0,arthur:0},calendarLink:"https://calendar.google.com",musicLink:"https://music.amazon.co.uk",netflixLink:"https://www.netflix.com"};
+const KEY="family-board-fire-editable-v1";let state=load();
+function clone(o){return JSON.parse(JSON.stringify(o))}
+function load(){try{const s=localStorage.getItem(KEY);if(!s)return clone(defaults);const p=JSON.parse(s);return {...clone(defaults),...p,henryChecks:p.henryChecks||{},arthurChecks:p.arthurChecks||{},points:{...defaults.points,...(p.points||{})}}}catch(e){return clone(defaults)}}
+function save(){localStorage.setItem(KEY,JSON.stringify(state))}
+function show(id){document.querySelectorAll(".screen").forEach(s=>s.classList.remove("active"));document.getElementById(id).classList.add("active")}
+function renderList(id,tasks,key){const wrap=document.getElementById(id);wrap.innerHTML="";tasks.forEach((task,i)=>{const lab=document.createElement("label");lab.className="item";const box=document.createElement("input");box.type="checkbox";box.checked=!!state[key][i];const span=document.createElement("span");span.textContent=task;if(box.checked)span.classList.add("done");box.onchange=()=>{state[key][i]=box.checked;span.classList.toggle("done",box.checked);save()};lab.appendChild(box);lab.appendChild(span);wrap.appendChild(lab)})}
+function renderPoints(){hp.textContent=state.points.henry;ap.textContent=state.points.arthur;hph.textContent=state.points.henry+" ⭐";aph.textContent=state.points.arthur+" ⭐"}
+function renderSettings(){ht.value=state.henryTasks.join("\n");at.value=state.arthurTasks.join("\n");cl.value=state.calendarLink;ml.value=state.musicLink;nl.value=state.netflixLink}
+function render(){renderList("hl",state.henryTasks,"henryChecks");renderList("al",state.arthurTasks,"arthurChecks");renderPoints();renderSettings()}
+function openLink(url){window.location.href=url}
+document.querySelectorAll("[data-screen]").forEach(b=>b.onclick=()=>show(b.dataset.screen));
+hr.onclick=()=>{state.henryChecks={};save();render()};ar.onclick=()=>{state.arthurChecks={};save();render()};
+document.querySelectorAll("[data-points]").forEach(b=>b.onclick=()=>{const[x,a]=b.dataset.points.split(":");if(a==="+1")state.points[x]++;if(a==="-1")state.points[x]=Math.max(0,state.points[x]-1);if(a==="reset")state.points[x]=0;save();renderPoints()});
+rap.onclick=()=>{state.points.henry=0;state.points.arthur=0;save();renderPoints()};
+save.onclick=()=>{state.henryTasks=ht.value.split("\n").map(x=>x.trim()).filter(Boolean);state.arthurTasks=at.value.split("\n").map(x=>x.trim()).filter(Boolean);state.henryChecks={};state.arthurChecks={};state.calendarLink=cl.value.trim()||defaults.calendarLink;state.musicLink=ml.value.trim()||defaults.musicLink;state.netflixLink=nl.value.trim()||defaults.netflixLink;save();render();show("home")};
+reset.onclick=()=>{if(confirm("Reset everything?")){localStorage.removeItem(KEY);state=load();render();show("home")}};
+cal.onclick=()=>openLink(state.calendarLink);mus.onclick=()=>openLink(state.musicLink);net.onclick=()=>openLink(state.netflixLink);
+render();
+</script>
+</body>
+</html>
