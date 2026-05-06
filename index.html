@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Family Dashboard</title>
+
+<style>
+body {
+  margin: 0;
+  font-family: Arial, sans-serif;
+  background: linear-gradient(180deg,#9fd3ff,#f2f7ff);
+  color: #222;
+}
+
+.container {
+  max-width: 1000px;
+  margin: auto;
+  padding: 20px;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.title {
+  font-size: 42px;
+  font-weight: bold;
+}
+
+.clock {
+  background: white;
+  padding: 15px 25px;
+  border-radius: 25px;
+  font-size: 32px;
+  font-weight: bold;
+  box-shadow: 0 6px 16px rgba(0,0,0,0.15);
+}
+
+.card {
+  background: white;
+  border-radius: 30px;
+  padding: 25px;
+  margin-bottom: 25px;
+  box-shadow: 0 8px 20px rgba(0,0,0,0.12);
+}
+
+.child-buttons {
+  display: flex;
+  gap: 15px;
+  margin-bottom: 25px;
+}
+
+.child-btn {
+  border: none;
+  border-radius: 18px;
+  padding: 16px 28px;
+  font-size: 24px;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.active {
+  background: #2563eb;
+  color: white;
+}
+
+.inactive {
+  background: #e5e7eb;
+}
+
+.points {
+  font-size: 28px;
+  font-weight: bold;
+  margin-bottom: 15px;
+}
+
+.progress {
+  width: 100%;
+  height: 22px;
+  background: #e5e7eb;
+  border-radius: 999px;
+  overflow: hidden;
+  margin-bottom: 25px;
+}
+
+.progress-bar {
+  height: 100%;
+  background: linear-gradient(90deg,#22c55e,#16a34a);
+  width: 0%;
+}
+
+.chore {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  background: #f8fbff;
+  padding: 18px;
+  border-radius: 18px;
+  margin-bottom: 14px;
+  font-size: 24px;
+}
+
+.chore input {
+  width: 30px;
+  height: 30px;
+}
+
+.apps-grid {
+  display: grid;
+  grid-template-columns: repeat(2,1fr);
+  gap: 18px;
+}
+
+.app-btn {
+  border: none;
+  border-radius: 24px;
+  padding: 30px;
+  color: white;
+  font-size: 28px;
+  font-weight: bold;
+  cursor: pointer;
+  box-shadow: 0 6px 14px rgba(0,0,0,0.15);
+}
+
+.calendar { background:#2563eb; }
+.music { background:#0f766e; }
+.alexa { background:#06b6d4; }
+.netflix { background:#111827; }
+.prime { background:#1d4ed8; }
+.disney { background:#4338ca; }
+
+.reset-btn {
+  margin-top: 25px;
+  width: 100%;
+  border: none;
+  background: #ef4444;
+  color: white;
+  font-size: 24px;
+  padding: 18px;
+  border-radius: 20px;
+  font-weight: bold;
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+<div class="header">
+  <div class="title">🏠 Family Dashboard</div>
+  <div class="clock" id="clock"></div>
+</div>
+
+<div class="card">
+
+<div class="child-buttons">
+  <button class="child-btn active" onclick="switchChild('Arthur', event)">Arthur</button>
+  <button class="child-btn inactive" onclick="switchChild('Henry', event)">Henry</button>
+</div>
+
+<div class="points" id="points">⭐ Points: 0</div>
+
+<div class="progress">
+  <div class="progress-bar" id="progressBar"></div>
+</div>
+
+<div id="chores"></div>
+
+<button class="reset-btn" onclick="resetChores()">Reset Today</button>
+
+</div>
+
+<div class="card">
+
+<h2 style="font-size:34px;margin-top:0;">📱 Apps</h2>
+
+<div class="apps-grid">
+
+<button class="app-btn calendar"
+onclick="fully.startApplication('com.kyy.calendarforgoogle')">
+📅 Calendar
+</button>
+
+<button class="app-btn music"
+onclick="fully.startApplication('com.amazon.mp3')">
+🎵 Music
+</button>
+
+<button class="app-btn alexa"
+onclick="fully.startApplication('com.amazon.dee.app')">
+🔵 Alexa
+</button>
+
+<button class="app-btn netflix"
+onclick="fully.startApplication('com.netflix.mediaclient')">
+🎬 Netflix
+</button>
+
+<button class="app-btn prime"
+onclick="fully.startApplication('com.amazon.avod')">
+▶ Prime
+</button>
+
+<button class="app-btn disney"
+onclick="fully.startApplication('com.disney.disneyplus')">
+✨ Disney+
+</button>
+
+</div>
+</div>
+</div>
+
+<script>
+
+const choresData = {
+
+Arthur: [
+'Make bed',
+'Brush teeth',
+'Pyjamas away',
+'Get dressed',
+'Tidy bedroom',
+'Ready for school'
+],
+
+Henry: [
+'Make bed',
+'Brush teeth',
+'Pyjamas away',
+'Get dressed',
+'Tidy bedroom',
+'Ready for school'
+]
+
+};
+
+let currentChild = 'Arthur';
+
+function renderChores() {
+
+const choresDiv = document.getElementById('chores');
+
+choresDiv.innerHTML = '';
+
+const saved = JSON.parse(localStorage.getItem(currentChild) || '[]');
+
+choresData[currentChild].forEach((chore,index)=>{
+
+const checked = saved.includes(index);
+
+choresDiv.innerHTML += `
+<div class="chore">
+<input type="checkbox"
+${checked ? 'checked' : ''}
+onchange="toggleChore(${index})">
+<span>${chore}</span>
+</div>
+`;
+
+});
+
+updatePoints();
+
+}
+
+function toggleChore(index){
+
+let saved = JSON.parse(localStorage.getItem(currentChild) || '[]');
+
+if(saved.includes(index)){
+saved = saved.filter(i=>i!==index);
+} else {
+saved.push(index);
+}
+
+localStorage.setItem(currentChild, JSON.stringify(saved));
+
+renderChores();
+
+}
+
+function updatePoints(){
+
+const saved = JSON.parse(localStorage.getItem(currentChild) || '[]');
+
+const points = saved.length * 10;
+
+document.getElementById('points').innerText = `⭐ Points: ${points}`;
+
+const percent = (saved.length / choresData[currentChild].length) * 100;
+
+document.getElementById('progressBar').style.width = percent + '%';
+
+}
+
+function switchChild(name, event){
+
+currentChild = name;
+
+const buttons = document.querySelectorAll('.child-btn');
+
+buttons.forEach(btn=>{
+btn.classList.remove('active');
+btn.classList.add('inactive');
+});
+
+event.target.classList.remove('inactive');
+event.target.classList.add('active');
+
+renderChores();
+
+}
+
+function resetChores(){
+
+localStorage.removeItem(currentChild);
+
+renderChores();
+
+}
+
+function updateClock(){
+
+const now = new Date();
+
+document.getElementById('clock').innerText =
+now.toLocaleTimeString([], {
+hour:'2-digit',
+minute:'2-digit'
+});
+
+}
+
+setInterval(updateClock,1000);
+
+updateClock();
+
+renderChores();
+
+</script>
+
+</body>
+</html>
