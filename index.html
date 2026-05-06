@@ -1,0 +1,563 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
+  <title>Family Dashboard</title>
+  <style>
+    :root {
+      --bg: #f4f7fb;
+      --card: #ffffff;
+      --text: #111827;
+      --muted: #6b7280;
+      --accent: #2563eb;
+      --green: #16a34a;
+      --red: #dc2626;
+      --orange: #f97316;
+      --radius: 26px;
+      --shadow: 0 12px 30px rgba(15, 23, 42, 0.12);
+    }
+
+    * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
+    body {
+      margin: 0;
+      font-family: Arial, Helvetica, sans-serif;
+      background: linear-gradient(135deg, #eef5ff, #f8fafc);
+      color: var(--text);
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    .app {
+      max-width: 1280px;
+      margin: 0 auto;
+      padding: 22px;
+    }
+
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 16px;
+      margin-bottom: 18px;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: clamp(32px, 5vw, 58px);
+      letter-spacing: -1px;
+    }
+
+    .subhead {
+      color: var(--muted);
+      font-size: 18px;
+      margin-top: 4px;
+    }
+
+    .time-card {
+      background: var(--card);
+      box-shadow: var(--shadow);
+      border-radius: var(--radius);
+      padding: 16px 22px;
+      text-align: right;
+      min-width: 190px;
+    }
+
+    #clock {
+      font-size: 38px;
+      font-weight: 800;
+      line-height: 1;
+    }
+
+    #date {
+      color: var(--muted);
+      margin-top: 6px;
+      font-size: 16px;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: 1.2fr 0.8fr;
+      gap: 18px;
+    }
+
+    .card {
+      background: var(--card);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: 20px;
+    }
+
+    .card-title {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 14px;
+    }
+
+    h2 {
+      margin: 0;
+      font-size: 28px;
+    }
+
+    .tabs {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 14px;
+    }
+
+    .tab {
+      border: none;
+      border-radius: 999px;
+      padding: 12px 20px;
+      font-size: 18px;
+      font-weight: 800;
+      background: #e5e7eb;
+      color: #374151;
+      cursor: pointer;
+    }
+
+    .tab.active {
+      background: var(--accent);
+      color: white;
+    }
+
+    .chore-list {
+      display: grid;
+      gap: 12px;
+    }
+
+    .chore {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      padding: 16px;
+      background: #f9fafb;
+      border: 2px solid #eef2f7;
+      border-radius: 20px;
+      font-size: 24px;
+      font-weight: 700;
+      cursor: pointer;
+      min-height: 68px;
+    }
+
+    .tick {
+      width: 38px;
+      height: 38px;
+      border-radius: 50%;
+      border: 4px solid #cbd5e1;
+      display: grid;
+      place-items: center;
+      flex: 0 0 auto;
+      font-weight: 900;
+      color: white;
+    }
+
+    .chore.done {
+      background: #ecfdf5;
+      border-color: #bbf7d0;
+      color: #14532d;
+      text-decoration: line-through;
+    }
+
+    .chore.done .tick {
+      background: var(--green);
+      border-color: var(--green);
+    }
+
+    .progress-wrap {
+      margin-top: 14px;
+    }
+
+    .progress-text {
+      font-size: 18px;
+      color: var(--muted);
+      margin-bottom: 8px;
+      font-weight: 700;
+    }
+
+    .progress-bar {
+      height: 18px;
+      background: #e5e7eb;
+      border-radius: 999px;
+      overflow: hidden;
+    }
+
+    .progress-fill {
+      height: 100%;
+      width: 0%;
+      background: var(--green);
+      transition: width 0.25s ease;
+    }
+
+    .apps-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 14px;
+    }
+
+    .app-btn {
+      border: none;
+      border-radius: 24px;
+      padding: 20px 12px;
+      color: white;
+      font-size: 22px;
+      font-weight: 900;
+      min-height: 108px;
+      box-shadow: 0 10px 18px rgba(0,0,0,0.15);
+      cursor: pointer;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .app-btn .icon { font-size: 34px; }
+    .netflix { background: #111827; }
+    .alexa { background: #0891b2; }
+    .prime { background: #2563eb; }
+    .music { background: #0d9488; }
+    .calendar { background: #7c3aed; }
+    .launcher { background: #64748b; }
+
+    .small-actions {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-top: 14px;
+    }
+
+    .small-btn {
+      border: none;
+      border-radius: 18px;
+      padding: 14px;
+      font-size: 16px;
+      font-weight: 800;
+      cursor: pointer;
+      background: #e5e7eb;
+      color: #111827;
+    }
+
+    .settings-panel {
+      display: none;
+      margin-top: 18px;
+    }
+
+    .settings-panel.show { display: block; }
+
+    textarea, input {
+      width: 100%;
+      border: 2px solid #d1d5db;
+      border-radius: 18px;
+      padding: 14px;
+      font-size: 18px;
+      font-family: Arial, Helvetica, sans-serif;
+      margin: 8px 0 16px;
+    }
+
+    label {
+      font-weight: 900;
+      font-size: 18px;
+    }
+
+    .save-btn {
+      border: none;
+      border-radius: 18px;
+      padding: 16px 24px;
+      font-size: 18px;
+      font-weight: 900;
+      background: var(--accent);
+      color: white;
+      cursor: pointer;
+    }
+
+    .reset-btn {
+      border: none;
+      border-radius: 18px;
+      padding: 16px 24px;
+      font-size: 18px;
+      font-weight: 900;
+      background: var(--red);
+      color: white;
+      cursor: pointer;
+      margin-left: 10px;
+    }
+
+    .note {
+      color: var(--muted);
+      font-size: 15px;
+      margin-top: 12px;
+    }
+
+    @media (max-width: 900px) {
+      .grid { grid-template-columns: 1fr; }
+      header { align-items: flex-start; }
+      .time-card { min-width: 160px; }
+      #clock { font-size: 30px; }
+      .chore { font-size: 21px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <header>
+      <div>
+        <h1>Family Dashboard</h1>
+        <div class="subhead">Chores, apps and home shortcuts</div>
+      </div>
+      <div class="time-card">
+        <div id="clock">--:--</div>
+        <div id="date">Loading...</div>
+      </div>
+    </header>
+
+    <div class="grid">
+      <section class="card">
+        <div class="card-title">
+          <h2>Chores</h2>
+          <button class="small-btn" onclick="toggleSettings()">⚙️ Settings</button>
+        </div>
+
+        <div class="tabs">
+          <button id="tab-arthur" class="tab active" onclick="setChild('arthur')">Arthur</button>
+          <button id="tab-henry" class="tab" onclick="setChild('henry')">Henry</button>
+        </div>
+
+        <div id="choreList" class="chore-list"></div>
+
+        <div class="progress-wrap">
+          <div id="progressText" class="progress-text">0 of 0 complete</div>
+          <div class="progress-bar"><div id="progressFill" class="progress-fill"></div></div>
+        </div>
+
+        <div class="small-actions">
+          <button class="small-btn" onclick="resetToday()">Reset Today</button>
+          <button class="small-btn" onclick="copyArthurToHenry()">Make Henry same as Arthur</button>
+        </div>
+
+        <div id="settingsPanel" class="settings-panel card">
+          <h2>Settings</h2>
+          <label>Arthur chores</label>
+          <textarea id="arthurInput" rows="7"></textarea>
+
+          <label>Henry chores</label>
+          <textarea id="henryInput" rows="7"></textarea>
+
+          <label>Settings PIN</label>
+          <input id="pinInput" type="password" placeholder="Optional" />
+
+          <button class="save-btn" onclick="saveSettings()">Save settings</button>
+          <button class="reset-btn" onclick="factoryReset()">Reset whole board</button>
+          <div class="note">Progress is saved on this device.</div>
+        </div>
+      </section>
+
+      <aside class="card">
+        <div class="card-title">
+          <h2>Apps</h2>
+        </div>
+        <div class="apps-grid">
+          <button class="app-btn netflix" onclick="openApp('com.netflix.mediaclient')"><span class="icon">🎬</span>Netflix</button>
+          <button class="app-btn alexa" onclick="openApp('com.amazon.dee.app')"><span class="icon">🔵</span>Alexa</button>
+          <button class="app-btn prime" onclick="openApp('com.amazon.avod')"><span class="icon">▶️</span>Prime Video</button>
+          <button class="app-btn music" onclick="openApp('com.amazon.mp3')"><span class="icon">🎵</span>Music</button>
+          <button class="app-btn calendar" onclick="openApp('com.kyy.calendarforgoogle')"><span class="icon">📅</span>Calendar</button>
+          <button class="app-btn launcher" onclick="openFullyLauncher()"><span class="icon">📱</span>All Apps</button>
+        </div>
+        <div class="note">These buttons use Fully Kiosk's JavaScript Interface. Turn it on in Fully Kiosk → Web Content Settings.</div>
+      </aside>
+    </div>
+  </div>
+
+  <script>
+    const DEFAULTS = {
+      currentChild: 'arthur',
+      chores: {
+        arthur: [
+          'Make bed / open blinds / turn off lights',
+          'Pyjamas away',
+          'Brush teeth',
+          'Ready to leave home',
+          'Tidy',
+          'Clothes away'
+        ],
+        henry: [
+          'Make bed / open blinds / turn off lights',
+          'Pyjamas away',
+          'Brush teeth',
+          'Ready to leave home',
+          'Tidy',
+          'Clothes away'
+        ]
+      },
+      pin: ''
+    };
+
+    let state = loadState();
+
+    function todayKey() {
+      const d = new Date();
+      return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
+    }
+
+    function loadState() {
+      const saved = localStorage.getItem('familyDashboardStateV4');
+      if (!saved) {
+        return { ...DEFAULTS, done: {}, date: todayKey() };
+      }
+      try {
+        const parsed = JSON.parse(saved);
+        if (parsed.date !== todayKey()) {
+          parsed.done = {};
+          parsed.date = todayKey();
+        }
+        return {
+          ...DEFAULTS,
+          ...parsed,
+          chores: { ...DEFAULTS.chores, ...(parsed.chores || {}) },
+          done: parsed.done || {}
+        };
+      } catch {
+        return { ...DEFAULTS, done: {}, date: todayKey() };
+      }
+    }
+
+    function saveState() {
+      localStorage.setItem('familyDashboardStateV4', JSON.stringify(state));
+    }
+
+    function setChild(child) {
+      state.currentChild = child;
+      saveState();
+      render();
+    }
+
+    function choreId(child, index) {
+      return `${todayKey()}-${child}-${index}`;
+    }
+
+    function toggleChore(index) {
+      const id = choreId(state.currentChild, index);
+      state.done[id] = !state.done[id];
+      saveState();
+      render();
+    }
+
+    function render() {
+      document.getElementById('tab-arthur').classList.toggle('active', state.currentChild === 'arthur');
+      document.getElementById('tab-henry').classList.toggle('active', state.currentChild === 'henry');
+
+      const chores = state.chores[state.currentChild] || [];
+      const list = document.getElementById('choreList');
+      list.innerHTML = '';
+
+      let doneCount = 0;
+      chores.forEach((text, index) => {
+        const done = !!state.done[choreId(state.currentChild, index)];
+        if (done) doneCount++;
+        const item = document.createElement('div');
+        item.className = 'chore' + (done ? ' done' : '');
+        item.onclick = () => toggleChore(index);
+        item.innerHTML = `<div class="tick">${done ? '✓' : ''}</div><div>${escapeHtml(text)}</div>`;
+        list.appendChild(item);
+      });
+
+      const total = chores.length;
+      const percent = total ? Math.round((doneCount / total) * 100) : 0;
+      document.getElementById('progressText').textContent = `${doneCount} of ${total} complete`;
+      document.getElementById('progressFill').style.width = percent + '%';
+
+      document.getElementById('arthurInput').value = (state.chores.arthur || []).join('\n');
+      document.getElementById('henryInput').value = (state.chores.henry || []).join('\n');
+      document.getElementById('pinInput').value = state.pin || '';
+    }
+
+    function escapeHtml(str) {
+      return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
+    }
+
+    function toggleSettings() {
+      if (state.pin) {
+        const attempt = prompt('Enter settings PIN');
+        if (attempt !== state.pin) return;
+      }
+      document.getElementById('settingsPanel').classList.toggle('show');
+    }
+
+    function saveSettings() {
+      state.chores.arthur = linesFromTextarea('arthurInput');
+      state.chores.henry = linesFromTextarea('henryInput');
+      state.pin = document.getElementById('pinInput').value.trim();
+      saveState();
+      render();
+      alert('Settings saved');
+    }
+
+    function linesFromTextarea(id) {
+      return document.getElementById(id).value.split('\n').map(x => x.trim()).filter(Boolean);
+    }
+
+    function copyArthurToHenry() {
+      state.chores.henry = [...state.chores.arthur];
+      saveState();
+      render();
+    }
+
+    function resetToday() {
+      if (!confirm('Reset today\'s progress?')) return;
+      Object.keys(state.done).forEach(key => {
+        if (key.startsWith(todayKey())) delete state.done[key];
+      });
+      saveState();
+      render();
+    }
+
+    function factoryReset() {
+      if (!confirm('Reset the whole board?')) return;
+      localStorage.removeItem('familyDashboardStateV4');
+      state = loadState();
+      render();
+    }
+
+    function updateClock() {
+      const now = new Date();
+      document.getElementById('clock').textContent = now.toLocaleTimeString('en-GB', {
+        hour: '2-digit',
+        minute: '2-digit'
+      });
+      document.getElementById('date').textContent = now.toLocaleDateString('en-GB', {
+        weekday: 'long',
+        day: 'numeric',
+        month: 'long'
+      });
+    }
+
+    function openApp(packageName) {
+      try {
+        if (window.FullyKiosk && typeof FullyKiosk.startApplication === 'function') {
+          FullyKiosk.startApplication(packageName);
+          return;
+        }
+      } catch (e) {}
+
+      alert('App launch needs Fully Kiosk JavaScript Interface turned ON. Package: ' + packageName);
+    }
+
+    function openFullyLauncher() {
+      window.location.href = 'fully://launcher';
+    }
+
+    updateClock();
+    setInterval(updateClock, 1000);
+    render();
+  </script>
+</body>
+</html>
