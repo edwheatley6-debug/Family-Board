@@ -1,0 +1,616 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Family Dashboard</title>
+
+<style>
+:root{
+  --blue:#2563eb;
+  --green:#22c55e;
+  --red:#ef4444;
+  --purple:#7c3aed;
+}
+
+*{
+  box-sizing:border-box;
+  -webkit-tap-highlight-color:transparent;
+}
+
+body{
+  margin:0;
+  font-family:Arial,sans-serif;
+  background:linear-gradient(180deg,#8fd3ff,#f7fbff);
+  color:#1f2937;
+}
+
+.container{
+  max-width:1050px;
+  margin:auto;
+  padding:20px;
+}
+
+.header{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  margin-bottom:20px;
+}
+
+.title{
+  font-size:44px;
+  font-weight:900;
+}
+
+.subtitle{
+  font-size:20px;
+  font-weight:700;
+  color:#475569;
+}
+
+.clock{
+  background:white;
+  padding:15px 25px;
+  border-radius:25px;
+  font-size:32px;
+  font-weight:900;
+  box-shadow:0 8px 18px rgba(0,0,0,.15);
+}
+
+.card{
+  background:white;
+  border-radius:32px;
+  padding:24px;
+  margin-bottom:24px;
+  box-shadow:0 10px 24px rgba(0,0,0,.14);
+}
+
+.child-choice{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:18px;
+}
+
+.child-card{
+  border:none;
+  border-radius:30px;
+  padding:34px 20px;
+  font-size:34px;
+  font-weight:900;
+  color:white;
+  cursor:pointer;
+}
+
+.arthur{
+  background:linear-gradient(135deg,#2563eb,#60a5fa);
+}
+
+.henry{
+  background:linear-gradient(135deg,#7c3aed,#c084fc);
+}
+
+.hidden{
+  display:none;
+}
+
+.top-row{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:12px;
+  margin-bottom:18px;
+}
+
+.child-name{
+  font-size:38px;
+  font-weight:900;
+}
+
+.small-btn{
+  border:none;
+  border-radius:18px;
+  padding:14px 18px;
+  font-size:18px;
+  font-weight:900;
+  cursor:pointer;
+}
+
+.back{
+  background:#e5e7eb;
+}
+
+.settings{
+  background:#111827;
+  color:white;
+}
+
+.points{
+  font-size:30px;
+  font-weight:900;
+  background:#fef9c3;
+  border:3px solid #fde047;
+  border-radius:22px;
+  padding:12px 18px;
+  display:inline-block;
+}
+
+.progress{
+  width:100%;
+  height:24px;
+  background:#e5e7eb;
+  border-radius:999px;
+  overflow:hidden;
+  margin:18px 0;
+}
+
+.progress-bar{
+  height:100%;
+  background:linear-gradient(90deg,#22c55e,#16a34a);
+  width:0%;
+}
+
+.chore{
+  display:flex;
+  align-items:center;
+  gap:18px;
+  background:#f8fbff;
+  padding:20px;
+  border-radius:22px;
+  margin-bottom:14px;
+  font-size:26px;
+  font-weight:800;
+  border:3px solid #e0f2fe;
+  cursor:pointer;
+}
+
+.tick{
+  width:38px;
+  height:38px;
+  border-radius:50%;
+  border:4px solid #93c5fd;
+  display:grid;
+  place-items:center;
+  font-size:26px;
+  color:white;
+  font-weight:900;
+}
+
+.chore.done{
+  background:#ecfdf5;
+  border-color:#86efac;
+  text-decoration:line-through;
+  color:#14532d;
+}
+
+.chore.done .tick{
+  background:#22c55e;
+  border-color:#22c55e;
+}
+
+.actions{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:14px;
+  margin-top:16px;
+}
+
+.add{
+  background:#22c55e;
+  color:white;
+}
+
+.reset{
+  background:#ef4444;
+  color:white;
+}
+
+.apps-grid{
+  display:grid;
+  grid-template-columns:repeat(2,1fr);
+  gap:18px;
+}
+
+.app-btn{
+  border:none;
+  border-radius:26px;
+  padding:30px;
+  color:white;
+  font-size:28px;
+  font-weight:900;
+  cursor:pointer;
+}
+
+.calendar{background:#2563eb;}
+.music{background:#0f766e;}
+.alexa{background:#06b6d4;}
+.netflix{background:#111827;}
+.prime{background:#1d4ed8;}
+.disney{background:#4338ca;}
+
+textarea{
+  width:100%;
+  border:3px solid #cbd5e1;
+  border-radius:20px;
+  padding:14px;
+  font-size:20px;
+  margin:8px 0 16px;
+}
+
+.save{
+  background:#2563eb;
+  color:white;
+}
+
+.weekly-reset{
+  background:#f97316;
+  color:white;
+  margin-top:12px;
+  width:100%;
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+<div class="header">
+  <div>
+    <div class="title">🏠 Family Dashboard</div>
+    <div class="subtitle">Choose your name and earn points!</div>
+  </div>
+  <div class="clock" id="clock"></div>
+</div>
+
+<div id="homeScreen" class="card">
+  <h2>Who is using the board?</h2>
+
+  <div class="child-choice">
+    <button class="child-card arthur" onclick="chooseChild('Arthur')">
+      Arthur
+    </button>
+
+    <button class="child-card henry" onclick="chooseChild('Henry')">
+      Henry
+    </button>
+  </div>
+</div>
+
+<div id="choresScreen" class="card hidden">
+
+  <div class="top-row">
+    <button class="small-btn back" onclick="goHome()">⬅ Names</button>
+
+    <div class="child-name" id="childName">Arthur</div>
+
+    <button class="small-btn settings" onclick="openSettings()">
+      ⚙ Settings
+    </button>
+  </div>
+
+  <div class="points" id="points">⭐ Today: 0 | Weekly: 0</div>
+
+  <div class="progress">
+    <div class="progress-bar" id="progressBar"></div>
+  </div>
+
+  <div id="chores"></div>
+
+  <div class="actions">
+    <button class="small-btn add" onclick="manualAddPoint()">
+      ➕ Add Point
+    </button>
+
+    <button class="small-btn reset" onclick="resetToday()">
+      Reset Today
+    </button>
+  </div>
+
+</div>
+
+<div id="settingsScreen" class="card hidden">
+
+  <div class="top-row">
+    <button class="small-btn back" onclick="closeSettings()">
+      ⬅ Back
+    </button>
+
+    <div class="child-name">Settings</div>
+  </div>
+
+  <label>Arthur chores</label>
+  <textarea id="arthurChores" rows="6"></textarea>
+
+  <label>Henry chores</label>
+  <textarea id="henryChores" rows="6"></textarea>
+
+  <button class="small-btn save" onclick="saveSettings()">
+    Save Settings
+  </button>
+
+  <button class="small-btn weekly-reset" onclick="resetWeeklyPoints()">
+    Reset Weekly Points
+  </button>
+
+</div>
+
+<div class="card">
+
+  <h2>📱 Apps</h2>
+
+  <div class="apps-grid">
+
+    <button class="app-btn calendar"
+      onclick="openApp('com.kyy.calendarforgoogle')">
+      📅 Calendar
+    </button>
+
+    <button class="app-btn music"
+      onclick="openApp('com.amazon.mp3')">
+      🎵 Music
+    </button>
+
+    <button class="app-btn alexa"
+      onclick="openApp('com.amazon.dee.app')">
+      🔵 Alexa
+    </button>
+
+    <button class="app-btn netflix"
+      onclick="openApp('com.netflix.mediaclient')">
+      🎬 Netflix
+    </button>
+
+    <button class="app-btn prime"
+      onclick="openApp('com.amazon.avod')">
+      ▶ Prime
+    </button>
+
+    <button class="app-btn disney"
+      onclick="openApp('com.disney.disneyplus')">
+      ✨ Disney+
+    </button>
+
+  </div>
+
+</div>
+
+</div>
+
+<script>
+
+const defaultChores = {
+  Arthur:[
+    'Make bed',
+    'Brush teeth',
+    'Pyjamas away',
+    'Get dressed',
+    'Tidy bedroom',
+    'Ready for school'
+  ],
+
+  Henry:[
+    'Make bed',
+    'Brush teeth',
+    'Pyjamas away',
+    'Get dressed',
+    'Tidy bedroom',
+    'Ready for school'
+  ]
+};
+
+let choresData =
+  JSON.parse(localStorage.getItem('choresData') ||
+  JSON.stringify(defaultChores));
+
+let currentChild = 'Arthur';
+
+function chooseChild(name){
+  currentChild = name;
+
+  document.getElementById('homeScreen').classList.add('hidden');
+  document.getElementById('choresScreen').classList.remove('hidden');
+
+  render();
+}
+
+function goHome(){
+  document.getElementById('choresScreen').classList.add('hidden');
+  document.getElementById('settingsScreen').classList.add('hidden');
+  document.getElementById('homeScreen').classList.remove('hidden');
+}
+
+function render(){
+
+  document.getElementById('childName').innerText = currentChild;
+
+  const chores = choresData[currentChild];
+
+  let done =
+    JSON.parse(localStorage.getItem(currentChild + '_done') || '[]');
+
+  let bonus =
+    parseInt(localStorage.getItem(currentChild + '_bonus') || '0');
+
+  let weeklyPoints =
+    parseInt(localStorage.getItem(currentChild + '_weeklyPoints') || '0');
+
+  let autoPoint =
+    done.length === chores.length && chores.length > 0 ? 1 : 0;
+
+  let totalToday = bonus + autoPoint;
+
+  document.getElementById('points').innerText =
+    '⭐ Today: ' + totalToday + ' | Weekly: ' + weeklyPoints;
+
+  document.getElementById('progressBar').style.width =
+    ((done.length / chores.length) * 100) + '%';
+
+  const choresBox = document.getElementById('chores');
+
+  choresBox.innerHTML = '';
+
+  chores.forEach((chore,index)=>{
+
+    const isDone = done.includes(index);
+
+    choresBox.innerHTML += `
+      <div class="chore ${isDone ? 'done' : ''}"
+           onclick="toggleChore(${index})">
+
+        <div class="tick">
+          ${isDone ? '✓' : ''}
+        </div>
+
+        <div>${chore}</div>
+
+      </div>
+    `;
+  });
+}
+
+function toggleChore(index){
+
+  let done =
+    JSON.parse(localStorage.getItem(currentChild + '_done') || '[]');
+
+  if(done.includes(index)){
+    done = done.filter(x=>x!==index);
+  } else {
+    done.push(index);
+  }
+
+  localStorage.setItem(
+    currentChild + '_done',
+    JSON.stringify(done)
+  );
+
+  render();
+}
+
+function manualAddPoint(){
+
+  let bonus =
+    parseInt(localStorage.getItem(currentChild + '_bonus') || '0');
+
+  bonus++;
+
+  localStorage.setItem(
+    currentChild + '_bonus',
+    bonus
+  );
+
+  render();
+}
+
+function resetToday(){
+
+  let done =
+    JSON.parse(localStorage.getItem(currentChild + '_done') || '[]');
+
+  let bonus =
+    parseInt(localStorage.getItem(currentChild + '_bonus') || '0');
+
+  let chores = choresData[currentChild];
+
+  let autoPoint =
+    done.length === chores.length && chores.length > 0 ? 1 : 0;
+
+  let totalToday = bonus + autoPoint;
+
+  let weeklyPoints =
+    parseInt(localStorage.getItem(currentChild + '_weeklyPoints') || '0');
+
+  weeklyPoints += totalToday;
+
+  localStorage.setItem(
+    currentChild + '_weeklyPoints',
+    weeklyPoints
+  );
+
+  localStorage.removeItem(currentChild + '_done');
+  localStorage.removeItem(currentChild + '_bonus');
+
+  render();
+}
+
+function resetWeeklyPoints(){
+
+  if(!confirm('Reset weekly points for both Arthur and Henry?')){
+    return;
+  }
+
+  localStorage.removeItem('Arthur_weeklyPoints');
+  localStorage.removeItem('Henry_weeklyPoints');
+
+  render();
+
+  alert('Weekly points reset');
+}
+
+function openSettings(){
+
+  document.getElementById('choresScreen').classList.add('hidden');
+  document.getElementById('settingsScreen').classList.remove('hidden');
+
+  document.getElementById('arthurChores').value =
+    choresData.Arthur.join('\n');
+
+  document.getElementById('henryChores').value =
+    choresData.Henry.join('\n');
+}
+
+function closeSettings(){
+
+  document.getElementById('settingsScreen').classList.add('hidden');
+  document.getElementById('choresScreen').classList.remove('hidden');
+
+  render();
+}
+
+function saveSettings(){
+
+  choresData.Arthur =
+    document.getElementById('arthurChores')
+    .value.split('\n')
+    .filter(x=>x.trim());
+
+  choresData.Henry =
+    document.getElementById('henryChores')
+    .value.split('\n')
+    .filter(x=>x.trim());
+
+  localStorage.setItem(
+    'choresData',
+    JSON.stringify(choresData)
+  );
+
+  closeSettings();
+}
+
+function openApp(pkg){
+
+  try{
+    fully.startApplication(pkg);
+  } catch(e){
+    alert('Could not open app');
+  }
+}
+
+function updateClock(){
+
+  document.getElementById('clock').innerText =
+    new Date().toLocaleTimeString([],{
+      hour:'2-digit',
+      minute:'2-digit'
+    });
+}
+
+setInterval(updateClock,1000);
+
+updateClock();
+
+</script>
+
+</body>
+</html>
